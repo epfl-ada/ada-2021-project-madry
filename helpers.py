@@ -69,9 +69,20 @@ LIWC_OCEAN_MAP = {
     'Swear': 'swear_words'
 }
 
-def predict_personality(liwc_data):
+def predict_personality(liwc_data: pd.DataFrame, sig_level: int = 1) -> pd.DataFrame:
+    """Predicts personality based on the LIWC metrics
+
+    Args:
+        liwc_data (pd.DataFrame): LIWC metrics
+        sig_level (int, optional): Significance level. Defaults to 3 (i.e. greater than 0.001)
+
+    Returns:
+        pd.DataFrame: Personality scores
+    """
     liwc_ocean_data = pd.read_csv('data/LIWC_OCEAN.csv', index_col=0)
+    liwc_ocean_sig_data = pd.read_csv('data/LIWC_OCEAN_Significance.csv', index_col=0)
     liwc_data = liwc_data[list(LIWC_OCEAN_MAP.keys())].rename(columns=LIWC_OCEAN_MAP)
     liwc_data = liwc_data.div(liwc_data.sum(axis=1), axis=0)
     assert (liwc_ocean_data.index == liwc_data.columns).all()
-    return liwc_data.dot(liwc_ocean_data)
+    liwc_ocean_data_with_sig = liwc_ocean_data * (liwc_ocean_sig_data >= sig_level).astype(int)
+    return liwc_data.dot(liwc_ocean_data_with_sig)
