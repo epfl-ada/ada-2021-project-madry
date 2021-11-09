@@ -24,7 +24,7 @@ We will be doing a category-based analysis of personality from word usage. We ha
 
 All of the analysis that we will be doing is based on personality traits of emotional traits of speakers. So, for each analysis, we have to collect and aggregate all the quotes from a subgroup of speakers for the particular analysis. Since the data that we are handling is huge, our strategy for analysing each event is to extract quotes and the necessary data for the particular analysis. Once the quotes for each speaker is extracted, we will be running it through the LIWC to categorize the quotes to 70 different word categories and find the word frequency for each category. We will be taking the inner product of the word frequencies and the correlation matrix to get a vector with each value corresponding to each personality type. This vector represents the personality of the speaker.
 
-*Data Handling*\
+*Data Handling*
 
 *Data Preprocessing*\
 Since quotebank is such a huge dataset we expected it to have some anomalies. As the first step of preprocessing we have decided to take only the quotes that have the probability of 80% or more to be spoken by the speaker. We chose to give more priority to the longer quotes since they more accurately represent a person's speech. Then we saw that there were 
