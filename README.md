@@ -24,11 +24,13 @@ We will be doing a category-based analysis of personality from word usage. We ha
 
 All of the analysis that we will be doing is based on personality traits of emotional traits of speakers. So, for each analysis, we have to collect and aggregate all the quotes from a subgroup of speakers for the particular analysis. Since the data that we are handling is huge, our strategy for analysing each event is to extract quotes and the necessary data for the particular analysis. Once the quotes for each speaker is extracted, we will be running it through the LIWC to categorize the quotes to 70 different word categories and find the word frequency for each category. We will be taking the inner product of the word frequencies and the correlation matrix to get a vector with each value corresponding to each personality type. This vector represents the personality of the speaker.
 
-*Data Handling*
+*Data Loading and Preprocessing*\
+The quote bank data was loaded chunk by chunk to be easily able to load to memory. We are using quotes from 2015 to 2020. As for the wikidata, we are using the parquet file provided for retrieving additional metadata and it is sufficient for the current research questions. However, if we find some interesting analysis in the future and we need extra information for that which is not available in the parquet file, we will be either creating our own parquet file or querying the necessary information from https://query.wikidata.org/ .
 
-*Data Preprocessing*\
-Since quotebank is such a huge dataset we expected it to have some anomalies. As the first step of preprocessing we have decided to take only the quotes that have the probability of 80% or more to be spoken by the speaker. We chose to give more priority to the longer quotes since they more accurately represent a person's speech. Then we saw that there were 
+Since quotebank is such a huge dataset we expected it to have some anomalies. As the first step of preprocessing we have decided to take only the quotes that have the probability of 80% or more to be spoken by the speaker. We chose to give more priority to the longer quotes since they more accurately represent a person's speech. We are removing quotes with word length more than 50 since it is highly unlikely to have such a word in the quote and there is a high chance the quote does not represent real speech. We then remove quotes with URLs in them. We were able to find some quotes with key value pairs in them, which is highly unlikely. So, we are removing all such quotes. Then we are checking the percentage of appearance of special characters in them. If it is more than 10% we are removing it since the chances of it representing real speech is low. 
 
+*Data Analysis*\
+To clearly test if we can analyse and get good results from this data, we did a sample personality analysis on 100 politicians with the most number of quotes in quotebank from both the Democratic and Republican party of USA. For each of these politicians we compile all the quotes and make a string of fixed length. This string is then used to do the personality analysis and get the personality vector. The analysis and the results are shown in detail in the notebook
 
 **Proposed timeline:**
 1. Analysis task division and initiation - Nov 27 - Dec 4
