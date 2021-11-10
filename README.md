@@ -1,7 +1,7 @@
-# Do words have (our) character?
+# Do words have (our) characters?
 
 ## Abstract:
-Speech is the main mode of communication through which a person expresses himself. So, it is natural for each and every person to have his/her own way of using a language to speak. There have been several studies on this topic that have shown significant correlations between different word categories and personality types. This intrigued us to exploit this correlation to identify personality characteristics for different speakers in the quotebank dataset. Similarities or differences of these personality characteristics of groups or individuals will be used to answer some specific questions about the world.
+Speech is the main mode of communication through which a person expresses themselfs. So, it is natural for each and every person to have his/her own way of using a language to speak. There have been several studies on this topic that have shown significant correlations between different word categories and personality types. This intrigued us to exploit this correlation to identify personality characteristics for different speakers in the quotebank dataset. Similarities or differences of these personality characteristics of groups or individuals will be used to answer some specific questions about the world.
 
 ## Research question:
 Through this project, we are trying to explore a few specific topics given the questions of interest.
