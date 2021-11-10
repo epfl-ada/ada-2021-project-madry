@@ -43,7 +43,7 @@ As the next step, we have decided to divide the research questions equally among
 1. Can we use the academic version of LIWC for data analy?
 2. Can the inner product of the word frequencies of the LIWC word categories and the correlation matrix be considered as a good method to find the personality matrix?
 
-## Reference:
+## References:
 
 [1] Yarkoni, T. (2010). Personality in 100,000 words: A large-scale analysis of personality and word use among bloggers. Journal of Research in Personality, 44(3), 363–373. https://doi.org/10.1016/j.jrp.2010.04.001 
 
