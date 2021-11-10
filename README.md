@@ -5,11 +5,11 @@ Speech is the main mode of communication through which a person expresses themse
 
 ## Research question:
 Through this project, we are trying to explore a few specific topics given the questions of interest.
-1. What are the personality traits of the different famous political leaders of the world and can we find a relation between these personality traits and why they are leaders
+1. What are the personality traits of the different famous political leaders of the world and what similarities and differences can we find between them?
 2. What are the personality traits of the different billionaires and CEOs? Is there something that makes them different from others?
-3. Personality traits of different gender, race and ethnicities and has these traits changed over the years?
+3. What are the personality traits of different gender, race and ethnicities and has these traits changed over the years?
 4. An analysis of change in emotional traits of people affected by an event, such as covid-19.
-5. Analysis of suicide victims, depression, bipolar disorder and their personality traits.
+5. Analysis of personality traits of people with mental disorders like depression, bipolar disorder etc. and suicide victims.
 
 
 ## Proposed additional dataset:
