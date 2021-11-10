@@ -1,3 +1,5 @@
+import re
+import datetime
 import pandas as pd
 
 LIWC_OCEAN_MAP = {
@@ -74,7 +76,7 @@ def predict_personality(liwc_data: pd.DataFrame, sig_level: int = 1) -> pd.DataF
 
     Args:
         liwc_data (pd.DataFrame): LIWC metrics
-        sig_level (int, optional): Significance level. Defaults to 3 (i.e. greater than 0.001)
+        sig_level (int, optional): Significance level. Defaults to 3 (i.e. less than 0.001)
 
     Returns:
         pd.DataFrame: Personality scores
@@ -86,3 +88,9 @@ def predict_personality(liwc_data: pd.DataFrame, sig_level: int = 1) -> pd.DataF
     assert (liwc_ocean_data.index == liwc_data.columns).all()
     liwc_ocean_data_with_sig = liwc_ocean_data * (liwc_ocean_sig_data >= sig_level).astype(int)
     return liwc_data.dot(liwc_ocean_data_with_sig)
+
+
+def to_datetime(datetime_str):
+    matches = re.search('.*(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})T(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2}):(?P<second>[0-9]{2}).*', datetime_str)
+    year, month, day = int(matches.group('year')), int(matches.group('month')), int(matches.group('day'))
+    return datetime.date(max(1, year), min(max(1, month), 12), min(max(1, day), 28))
