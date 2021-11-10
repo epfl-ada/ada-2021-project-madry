@@ -32,7 +32,7 @@ To clearly test if we can analyse and get good results from this data, we did a 
 ## Proposed timeline:
 | Date            | Task                                         |
 | --------------- | ---------------------------------------------|
-| Nov 27 - Dec 4  | Analysis task division and initiation        |
+| Nov 27 - Dec 4  | Initiation of data analysis task for different research questions |
 | Dec 5 - Dec 11  | Result Discussion and story structuring      |
 | Dec 11 - Dec 17 | Notebook structuring and Data story creation |
 
