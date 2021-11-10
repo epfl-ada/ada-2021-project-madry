@@ -17,9 +17,9 @@ We will not be using any additional data other than Quotebank and Wikidata, whic
  
 ## Methods:
 ### Personality Analysis
-We will be doing a category-based analysis of personality from word usage. We have found much research on the same. Most of these papers focus on finding the correlation between personality types and LIWC word categories using supervised learning methods. After fine-grained research through the different papers, we have decided to use the correlation matrix between the big five personality types (and their subtypes) and LIWC word categories, from a highly cited paper.
+We will be doing a category-based analysis of personality from word usage. We have found much research on the same. Most of these papers focus on finding the correlation between personality types and LIWC word categories using supervised learning methods[1]. After fine-grained research through the different papers, we have decided to use the correlation matrix between the big five personality types (and their subtypes) and LIWC word categories, from a highly cited paper.
 
-All of the analysis that we will be doing is based on personality traits of emotional traits of speakers. So, for each analysis, we have to collect and aggregate all the quotes from a subgroup of speakers for the particular analysis. Since the data that we are handling is huge, our strategy for analysing each event is to extract quotes and the necessary data for the particular analysis. Once the quotes for each speaker is extracted, we will be running it through the LIWC to categorize the quotes to 70 different word categories and find the word frequency for each category. We will be taking the inner product of the word frequencies and the correlation matrix to get a vector with each value corresponding to each personality type. This vector represents the personality of the speaker.
+All of the analysis that we will be doing is based on personality traits of emotional traits of speakers. So, for each analysis, we have to collect and aggregate all the quotes from a subgroup of speakers for the particular analysis. Since the data that we are handling is huge, our strategy for analysing each event is to extract quotes and the necessary data for the particular analysis. Once the quotes for each speaker is extracted, we will be running it through the LIWC[2] to categorize the quotes to 66 different word categories and find the word frequency for each category[2]. We will be taking the inner product of the word frequencies and the correlation matrix to get a vector with each value corresponding to each personality type. This vector represents the personality of the speaker.
 
 ### Data Loading and Preprocessing
 The quote bank data was loaded chunk by chunk to be easily able to load to memory. We are using quotes from 2015 to 2020. As for the wikidata, we are using the parquet file provided for retrieving additional metadata and it is sufficient for the current research questions. However, if we find some interesting analysis in the future and we need extra information for that which is not available in the parquet file, we will be either creating our own parquet file or querying the necessary information from https://query.wikidata.org/ .
@@ -42,3 +42,9 @@ As the next step, we have decided to divide the research questions equally among
 ## Questions for TAs:
 1. Can we use the academic version of LIWC for data analy?
 2. Can the inner product of the word frequencies of the LIWC word categories and the correlation matrix be considered as a good method to find the personality matrix?
+
+## Reference:
+
+[1] Yarkoni, T. (2010). Personality in 100,000 words: A large-scale analysis of personality and word use among bloggers. Journal of Research in Personality, 44(3), 363–373. https://doi.org/10.1016/j.jrp.2010.04.001 
+
+[2] Pennebaker JW, Francis ME, Booth RJ. Mahway. New Jersey: Lawrence Erlbaum Associates; 2001. Linguistic inquiry and word count: LIWC 2001.
