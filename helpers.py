@@ -7,6 +7,7 @@ import json
 import os
 import bz2
 import time
+import csv
 from tqdm import tqdm
 from collections import defaultdict
 
@@ -391,3 +392,11 @@ def concatenate_quotes(quotes, quote_length=5000):
         quotes[qid] = concat
 
     return quotes
+
+
+def write_quotes_to_csv(quotes, output_file):
+    with open(output_file, 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['qid', 'quote'])
+        for qid, quote in quotes.items():
+            writer.writerow([qid, quote])
