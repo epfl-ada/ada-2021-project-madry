@@ -83,6 +83,16 @@ LIWC_OCEAN_MAP = {
     'Swear': 'swear_words'
 }
 
+PERSONALITY_ATTRS = ['neuroticism', 'anxiety', 'hostility', 'depression',
+                     'self_consciousness', 'immoderation', 'vulnerability', 'extraversion',
+                     'friendliness', 'gregariousness', 'assertiveness', 'activity_level',
+                     'excitement_seeking', 'cheerfulness', 'openness', 'imagination',
+                     'artistic_interests', 'emotionality', 'adventurousness', 'intellect',
+                     'liberalism', 'agreeableness', 'trust', 'morality', 'altruism',
+                     'cooperation', 'modesty', 'sympathy', 'conscientiousness',
+                     'self_efficacy', 'orderliness', 'dutifulness', 'achievement_striving',
+                     'self_discipline', 'cautiousness']
+
 def predict_personality(liwc_data: pd.DataFrame, sig_level: int = 1) -> pd.DataFrame:
     """Predicts personality based on the LIWC metrics.
     This function computes personality scores based on the LIWC features. It essentially multiplies the matrix of normalized LIWC
