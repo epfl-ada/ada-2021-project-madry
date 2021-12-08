@@ -10,6 +10,7 @@ import time
 import csv
 from tqdm import tqdm
 from collections import defaultdict
+from wikidata.client import Client
 
 PATTERN_INPUT = 'data/quotebank/quotes-{}.json.bz2'
 CHUNK_SIZE = 1_048_576
@@ -410,3 +411,9 @@ def write_quotes_to_csv(quotes, output_file):
         writer.writerow(['qid', 'quote'])
         for qid, quote in quotes.items():
             writer.writerow([qid, quote])
+
+
+def get_wiki_entity(qid):
+    client = Client()
+    entity = client.get(qid, load=True)
+    return entity
