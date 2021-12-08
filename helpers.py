@@ -12,6 +12,8 @@ from tqdm import tqdm
 from collections import defaultdict
 from wikidata.client import Client
 
+wiki_client = Client()
+
 PATTERN_INPUT = 'data/quotebank/quotes-{}.json.bz2'
 CHUNK_SIZE = 1_048_576
 
@@ -414,6 +416,20 @@ def write_quotes_to_csv(quotes, output_file):
 
 
 def get_wiki_entity(qid):
-    client = Client()
-    entity = client.get(qid, load=True)
+    entity = wiki_client.get(qid, load=True)
     return entity
+
+
+def get_countries(qids):
+    countries = {}
+    entity_instanceof = get_wiki_entity('P31')
+    entity_country = get_wiki_entity('Q6256')
+
+    for qid in qids:
+        entity = get_wiki_entity(qid)
+        for instance in entity.getlist(entity_instanceof):
+            if instance == entity_country:
+                countries[qid] = entity
+                break
+    
+    return countries
