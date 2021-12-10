@@ -144,6 +144,10 @@ def to_datetime(datetime_str):
     return datetime.date(max(1, year), min(max(1, month), 12), min(max(1, day), 28))
 
 
+def read_json(json_file):
+    with open(json_file) as f:
+        return json.load(f)
+
 def write_json_to_file(name, obj):
     # Use current timestamp to make the name of the file unique
     millis = round(time.time() * 1000)
@@ -433,3 +437,16 @@ def get_countries(qids):
                 break
     
     return countries
+
+
+def get_iso_code(qid):
+    entity_iso = get_wiki_entity('P298')
+    entity = get_wiki_entity(qid)
+    iso = entity.getlist(entity_iso)
+    return iso[0] if len(iso) > 0 else None
+
+
+def get_country_info(qid):
+    entity = get_wiki_entity(qid)
+    iso = get_iso_code(qid)
+    return {'name': str(entity.label), 'iso': str(iso)}
