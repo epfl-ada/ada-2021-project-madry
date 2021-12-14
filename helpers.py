@@ -11,6 +11,11 @@ import csv
 from tqdm import tqdm
 from collections import defaultdict
 from wikidata.client import Client
+import math
+import numpy as np
+import plotly.express as px
+from sklearn.cluster import DBSCAN
+from sklearn.manifold import TSNE
 
 wiki_client = Client()
 
@@ -450,3 +455,138 @@ def get_country_info(qid):
     entity = get_wiki_entity(qid)
     iso = get_iso_code(qid)
     return {'name': str(entity.label), 'iso': str(iso)}
+
+def number_of_clusters(labels):
+    return len(np.unique(labels))
+
+def clustering_percentage_score(labels):
+    score = 0
+    for val in np.unique(labels):
+        number_of_vals = len(labels[labels == val])
+        if number_of_vals > score:
+            score = number_of_vals
+    return (len(labels) - score)
+
+def search_for_epsilon(
+    df, 
+    cluster_columns, 
+    iterations=20,
+    clustering_score_function=number_of_clusters
+):
+    print('Searching for best EPSILON for DBSCAN!')
+    lower_eps = 1
+    lower_score = clustering_score_function(np.array([lower_eps]))
+            
+    upper_eps = 20 
+    upper_score = clustering_score_function(np.array([upper_eps]))
+
+    best_eps = lower_eps
+    best_score = lower_score
+
+    for i in range(iterations):
+        mid_eps = (lower_eps + upper_eps) / 2.0
+        mid_clusters = DBSCAN(eps=mid_eps).fit(df[PERSONALITY_ATTRS])
+        mid_score = clustering_score_function(mid_clusters.labels_)
+        print(f'{"eps:":5}{mid_eps:5}\t score: {mid_score}')
+
+        if mid_score > best_score:
+            best_eps = mid_eps
+            best_score = mid_score
+            
+        mid_plus = mid_eps + (upper_eps - mid_eps) * 0.1
+        mid_minus = mid_eps - (mid_eps - lower_eps) * 0.1
+
+        mid_plus_test = DBSCAN(eps=mid_plus).fit(df[PERSONALITY_ATTRS])
+        mid_minus_test = DBSCAN(eps=mid_minus).fit(df[PERSONALITY_ATTRS])
+        
+        mid_plus_score = clustering_score_function(mid_plus_test.labels_)
+        mid_minus_score = clustering_score_function(mid_minus_test.labels_)
+
+        if mid_plus_score > mid_minus_score:
+            lower_eps = mid_eps
+            lower_score = mid_score
+        elif mid_minus_score:
+            upper_eps = mid_eps
+            upper_score = mid_score
+        else:
+            if upper_score > lower_score:
+                lower_eps = mid_eps
+                lower_score = mid_score
+            else:
+                upper_eps = mid_eps
+                upper_score = mid_score
+    
+    print(f'Best EPSILON:\t{best_eps}')
+    return best_eps
+            
+def scatter_plot_clusters(
+    df, 
+    cluster_columns,
+    hover_name,
+    hover_data,
+    eps=0, 
+    normalize=True,
+    clustering_score_function=number_of_clusters
+):
+    """
+    Perform clustering using DBSCAN.
+    Visualize the clusters with a scatter plot, using TSNE to reduce dimensionality of data.
+
+    Args:
+        df (DataFrame): Clustering is performed using the data from this dataframe.
+        cluster_columns (array of str): Names of dataframe columns which are used for clustering.
+        hover_name (str): When a scatter point is hovered, this column from the relevant dataframe row is used as a title for the popup card.
+        hover_data (array of str): When a scatter point is hovered, these columns from the relevant dataframe row are used as content for the popup card.
+        eps (float): Epsilon values used for DBSCAN algorithm. If 0 is passed search_for_epsilon function is invoked in order to get a valid value.
+        normalize (bool): Whether to normalize the columns used for clustering.
+        clustering_score_function (function): Function used to score how good of a fit a certain value of epsilon is. A higher score is a better score.
+            Args:
+                labels (array of int): Array of cluster labels. Each element is the cluster label of the relevant dataframe row.
+                
+            Returns:
+                score (int): How good the assigned labels are according to some parameter. Higher is better.
+    """
+    # Make copy so no side effects are felt outside function
+    df = df.copy()
+    
+    # Normalize columns used for clustering
+    if normalize:
+        normalized = df[cluster_columns]
+        df[cluster_columns]
+    
+    # Search for best epsilon if not provided
+    if eps == 0:
+        eps = search_for_epsilon(
+            df, 
+            cluster_columns, 
+            clustering_score_function=clustering_score_function
+        )
+        
+    # Get cluster labels using DBSCAN
+    cluster_info = DBSCAN(eps=eps).fit(df[cluster_columns])
+    
+    # Get 2D representation using TSNE - used just for visualisation
+    coordinates = TSNE().fit_transform(df[cluster_columns])
+    
+    # Add resulting labels and coordinates to DataFrame
+    CLUSTER_LABELS_COLUMN_NAME = '__cluster__clusterLabel'
+    CLUSTER_X_COORDS_COLUMN_NAME = '__cluster__coordinate_x'
+    CLUSTER_Y_COORDS_COLUMN_NAME = '__cluster__coordinate_y'
+    
+    df[CLUSTER_LABELS_COLUMN_NAME] = cluster_info.labels_
+    df[CLUSTER_X_COORDS_COLUMN_NAME] = coordinates[:, 0]
+    df[CLUSTER_Y_COORDS_COLUMN_NAME] = coordinates[:, 1]
+    
+    # Draw scatter plot
+    fig = px.scatter(
+        df, 
+        x=CLUSTER_X_COORDS_COLUMN_NAME, 
+        y=CLUSTER_Y_COORDS_COLUMN_NAME, 
+        hover_name=hover_name, 
+        hover_data=hover_data,
+        color=CLUSTER_LABELS_COLUMN_NAME, 
+        size_max=60
+    )
+    fig.update_layout(
+         height=800)
+    fig.show()
