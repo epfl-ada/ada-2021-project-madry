@@ -1,0 +1,66 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(plotly)
+library(gtsummary)
+library(dplyr)
+library(ggplot2)
+library(ggbiplot)
+library(ggpubr)
+# require(d3heatmap, lib.loc ="/Users/yirencao/Desktop")
+df = read.csv("concats")
+
+df1 <- df %>% select(c(87:121, 123, 134)) # 87:121 contains all personalities, 123 is name, 134 is party
+df_personality_party <-  df %>% select(c(87:121, 134))
+
+df2 <- df %>% select(c(123, 87:121))
+rownames(df2) <- df2$itemLabel
+df2 <- df2 %>% select(-itemLabel)
+pca_df = princomp(df2)
+# install.packages("remotes")
+# remotes::install_github("vqv/ggbiplot")
+
+p1 = ggscreeplot(pca_df) +
+  theme_bw(base_size = 20) + labs(y = "Prop. of explained variance")
+p2 = ggscreeplot(pca_df,type = "cev") + theme_bw(base_size = 20) + labs(y = " Cumulative prop. of explained variance")
+
+# gridExtra::grid.arrange(p1, p2, ncol=2)
+
+
+# ggbiplot(pca_df, labels =  rownames(df2), labels.size = 3, varname.size = 5) +
+#   theme_bw(base_size = 20) + coord_cartesian(ylim = c(-2.5,2.5), xlim = c(-2.5,2.5))
+
+set.seed(1)
+cl_df = kmeans(df2, centers = 5, nstart = 10)
+p = ggbiplot(
+  pca_df,
+  groups = factor(cl_df$cluster),
+  labels =  rownames(df2),
+  labels.size= 1.5,
+  ellipse = TRUE, var.axes = FALSE) + 
+  theme_bw(base_size = 20) +
+  theme(legend.position = "none") + theme_transparent() 
+# p_build <- ggplot_build(p)
+
+
+# p_data <- p_build$data
+# 
+# p_build$data[[1]]<- p_data[[1]][p_data[[1]]$xend**2 + p_data[[1]]$xend**2 > 1, ] 
+# p_build$data[[4]]<- p_data[[4]][p_data[[1]]$xend**2 + p_data[[1]]$xend**2 > 1, ] 
+
+# p_build
+# g$data[[1]] <- g$data[[1]][-(3:4), ]
+```
+
+
+```{r, echo = FALSE}
+# gtable <- ggplot_gtable(p_build)
+# p_build$plot
+# ggplotly(plot(ggplot_gtable(p_build)), height = 1000, width=1000)
+ggplotly(p, height = 1100, width=1100) 
+# p_build$data[[4]]
+
+# grid.draw(ggplot_gtable(p_build))
+
+```

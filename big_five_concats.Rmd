@@ -36,11 +36,11 @@ ggplotly(p1)
 ```
 
 ```{r}
-# Bernie Sanders
-Sanders <- df %>% filter(itemLabel == "Bernie Sanders")
-long <- Sanders %>% gather(personality, value, -c(itemLabel, party, year))
-p4 = ggplot(long, aes(x=year, y = value, colour = personality)) +  geom_line()
-ggplotly(p4)
+# # Bernie Sanders
+# Sanders <- df %>% filter(itemLabel == "Bernie Sanders")
+# long <- Sanders %>% gather(personality, value, -c(itemLabel, party, year))
+# p4 = ggplot(long, aes(x=year, y = value, colour = personality)) +  geom_line()
+# ggplotly(p4)
 ```
 
 
@@ -56,10 +56,10 @@ ggplotly(p2)
 
 ```{r}
 # # Hillary
-hillary <- df %>% filter(itemLabel == "Hillary Clinton")
-long <- hillary %>% gather(personality, value, -c(itemLabel, party, year))
-p3 = ggplot(long, aes(x=year, y = value, colour = personality)) +  geom_line()
-ggplotly(p3)
+# hillary <- df %>% filter(itemLabel == "Hillary Clinton")
+# long <- hillary %>% gather(personality, value, -c(itemLabel, party, year))
+# p3 = ggplot(long, aes(x=year, y = value, colour = personality)) +  geom_line()
+# ggplotly(p3)
 ```
 
 
@@ -73,10 +73,10 @@ ggplotly(p5)
 
 
 ```{r}
-Graham <- df %>% filter(itemLabel == "Lindsey Graham")
-long <- Graham %>% gather(personality, value, -c(itemLabel, party, year))
-p6 = ggplot(long, aes(x=year, y = value, colour = personality)) +  geom_line()
-ggplotly(p6)
+# Graham <- df %>% filter(itemLabel == "Lindsey Graham")
+# long <- Graham %>% gather(personality, value, -c(itemLabel, party, year))
+# p6 = ggplot(long, aes(x=year, y = value, colour = personality)) +  geom_line()
+# ggplotly(p6)
 ```
 
 
@@ -88,6 +88,56 @@ ggplot(only_five_long, aes(x=year, y = value, colour = personality)) +  geom_lin
 
 # only_five %>% filter(itemLabel == "Bernie Sanders")
 
+```
+
+```{r}
+only_five <- df %>% select(neuroticism, extraversion, agreeableness, conscientiousness, openness, year, itemLabel) 
+only_five_long <- only_five %>%  gather(personality, value, -c(itemLabel, year)) %>% filter(itemLabel %in% c("Barack Obama", "Hillary Clinton", "Joe Biden", "Elizabeth Warren", "Andrew Cuomo", "Donald Trump", "Lindsey Graham", "George W. Bush","Bernie Sanders"))
+# 
+# ggplot(only_five_long, aes(x=year, y = value, colour = personality)) +  geom_line() + facet_wrap(~itemLabel)
+# 
+# 
+# ggplot(
+#   only_five_long,
+#   aes(year, value, group = personality, color = personality)
+# ) +
+#   geom_line() +
+#   scale_color_viridis_d() +
+#   labs(x = "year", y = "value") +
+#   theme(legend.position = "top")
+
+
+pca_arrests = princomp(df1)
+# install.packages("remotes")
+# remotes::install_github("vqv/ggbiplot")
+library(ggbiplot)
+p1 = ggscreeplot(pca_arrests) +
+  theme_bw(base_size = 20) + labs(y = "Prop. of explained variance")
+p2 = ggscreeplot(pca_arrests,type = "cev") + theme_bw(base_size = 20) + labs(y = " Cumulative prop. of explained variance")
+gridExtra::grid.arrange(p1, p2, ncol=2)
+
+
+ggbiplot(pca_arrests, labels =  rownames(df1), labels.size = 3, varname.size = 5) +
+  theme_bw(base_size = 20) + coord_cartesian(ylim = c(-2.5,2.5), xlim = c(-2.5,2.5))
+
+set.seed(1)
+cl_arrests = kmeans(df1, centers = 4, nstart = 10)
+p = ggbiplot(
+  pca_arrests,
+  groups = factor(cl_arrests$cluster),
+  labels =  rownames(df1),
+  ellipse = TRUE) + 
+  theme_bw(base_size = 20) +
+  theme(legend.position = "none")
+p
+df1$cluster = cl_arrests$cluster
+df_cluster = df1 %>% dplyr::select(cluster)
+summary(cl_arrests$cluster)
+df_cluster$pickup_community_area = rownames(df_cluster)
+rownames(df_cluster) = 1:77
+
+
+ 
 ```
 
 
