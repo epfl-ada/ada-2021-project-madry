@@ -344,6 +344,45 @@ def check_if_speaker_quote(row: dict, quotes: dict, speakers: list) -> None:
     arr.append(data)
     quotes[qid] = arr
 
+def merge_wikidata_entries(data, columns_to_merge):
+    wikidata_merged = dict()
+
+    index = 0
+    for row in data:
+        # Extract the QID from the link (ex. http://www.wikidata.org/entity/Q203286 -> Q203286)
+        if row['item'].startswith('http://www.wikidata.org/entity/'):
+            qid_start = row['item'].rindex('/') + 1
+            key = row['item'][qid_start:]
+            # Replace the link with the QID
+            row['item'] = key
+        else:
+            key = row['item']
+
+        if key in wikidata_merged:
+            merged_entry = wikidata_merged[key]
+            """
+            Merge the values for every column:
+                - if the values are the same - do nothing
+                - if the values are different - create a list and add them both
+            """
+            for col in columns_to_merge:
+                if row.get(col, None) is None:
+                    continue
+
+                updated_entry = merged_entry.get(col, None)
+
+                if updated_entry is None:
+                    updated_entry = row[col]
+                elif isinstance(updated_entry, list):
+                    if row[col] not in updated_entry:
+                        updated_entry.append(row[col])
+                elif row[col] != updated_entry:
+                    updated_entry = [updated_entry, row[col]]
+
+                merged_entry[col] = updated_entry
+        else:
+            wikidata_merged[key] = row
+    return wikidata_merged
 
 def combine_quotes_files(quote_files):
     combined_quotes = defaultdict(list)
@@ -357,6 +396,23 @@ def combine_quotes_files(quote_files):
 
     return combined_quotes
 
+def combine_quotes_files_2nd_format(wikidata_list, quote_files):
+    combined_dict = {}
+
+    for v in wikidata_list:
+        copy = dict(v)
+        # add quotations field
+        copy['quotations'] = []
+
+        combined_dict[v['item']] = copy
+
+    for file_name in quote_files:
+        with open(file_name, 'r', encoding='utf-8') as f:
+            quotes = json.load(f)
+
+            for k in quotes.keys():
+                combined_dict[k]['quotations'] += quotes[k]
+    return combined_dict
 
 def filter_quotes(quotes):
     filtered_quotes = []
@@ -395,6 +451,43 @@ def filter_quotes(quotes):
 
     return quotes, filtered_quotes
 
+def filter_quotes_2nd_format(quotes):
+    dirty_quotes = []
+
+    weird_pattern = '[_@#+&;:\(\)\{\}\[\]\\/`]'
+    json_pattern = '\{.*[a-zA-Z]+:\s[\'"`][a-zA-Z0-9]+[\'"`].*\}'
+    url_pattern = 'https?'
+
+    for k in quotes.keys():
+        elem = quotes[k]
+
+        new_arr = []
+        for entry in elem['quotations']:
+            text = entry['quotation']
+
+            longest = max(entry['quotation'].split(), key=len)
+            if (len(longest) > 50):
+                dirty_quotes.append(entry)
+                continue
+
+            if re.search(url_pattern, text) is not None:
+                dirty_quotes.append(entry)
+                continue
+
+            if re.search(json_pattern, text) is not None:
+                dirty_quotes.append(entry)
+                continue
+
+            weird_num = len(re.findall(weird_pattern, text))
+            total = len(text)
+            weird_percent = weird_num / total
+            if (weird_percent > 0.1):
+                dirty_quotes.append(entry)
+                continue
+
+            new_arr.append(entry)
+        elem['quotations'] = new_arr
+    return quotes, dirty_quotes
 
 def concatenate_quotes(quotes, quote_length=5000):
     for qid, quote_lst in quotes.items():
@@ -415,6 +508,24 @@ def concatenate_quotes(quotes, quote_length=5000):
 
     return quotes
 
+def concatenate_quotes_2nd_format(quotes, quote_length=5000):
+    for elem in quotes.values():
+        # Sort the quotes by length
+        elem['quotations'].sort(key = lambda x: len(x['quotation']), reverse = True)
+
+        concat = ''
+        for quote in elem['quotations']:
+            # Concatenate the quotes
+            concat += ' ' + quote['quotation']
+
+            # Trim if we are over QUOTE_LENGTH
+            if (len(concat) >= quote_length):
+                concat = concat[0:quote_length]
+                break
+
+        elem['quotations'] = concat
+        
+    return quotes
 
 def write_quotes_to_csv(quotes, output_file):
     with open(output_file, 'w', encoding='UTF8', newline='') as f:
