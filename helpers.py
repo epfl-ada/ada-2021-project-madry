@@ -701,3 +701,19 @@ def scatter_plot_clusters(
     fig.update_layout(
          height=800)
     fig.show()
+
+
+def visualize_world(df, location_col, color_col, hover_cols, title=None, labels=None, animation_col=None, color_scale=px.colors.sequential.Rainbow, range_col=[0, 1]):
+    fig = px.choropleth(df, locations=location_col,
+                        color=color_col,
+                        hover_data=hover_cols,
+                        color_continuous_scale=color_scale,
+                        labels=labels,
+                        title=title,
+                        animation_frame=animation_col,
+                        range_color=range_col)
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
+    fig.update_geos(visible=False)
+    return fig
