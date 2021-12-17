@@ -26,12 +26,6 @@ https://mismayil.github.io/words-personalities/
   - Gender Analysis: Decision Tree and Cross Validation
   - Data Story: Politician Section
 
-Example
-John: Plotting graphs during data analysis, crawling the data, preliminary data analysis;
-Mary: Problem formulation, coming up with the algorithm;
-Chris: Coding up the algorithm, running tests, tabulating final results;
-Eve: Writing up the report or the data story, preparing the final presentation.
-
 ## Abstract
 Language is the main mode of communication through which a person expresses their thoughts and feelings. This then raises an interesting question: Can language use reflect personality types?  There have been several studies on this topic that have shown significant correlations between different word categories and personality types. In this project, we exploit these correlations to identify personality characteristics for different speakers in the Quotebank dataset. Similarities or differences of these personality styles of groups or individuals are then used to answer some interesting psycho-sociolinguistic questions about people across professions, countries, races and ethnicities among other categories.
 
