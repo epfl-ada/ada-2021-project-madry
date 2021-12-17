@@ -15,7 +15,7 @@ https://mismayil.github.io/words-personalities/
 - Mete: (gender.ipynb & country.ipynb)
   - Gender Analysis: Data cleaning for the analysis, heatmap, histograms, independent t-test, validation with external resource
   - Country Analysis: Data cleaning for the analysis, interactive world map
-  - Data Story: Gender & Country Section
+  - Data Story: Introduction, Gender & Country Section
 
 - Rohith: (entrepreneur_artist_compare.ipynb)
   - Entrepreneur & Artist Analysis: Data cleaning for the analysis, heapmap, histograms, validation with external resource
