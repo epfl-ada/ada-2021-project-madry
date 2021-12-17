@@ -4,6 +4,33 @@
 
 https://mismayil.github.io/words-personalities/
 
+## Contribution Details of all group members: **with final notebooks mentioned**
+
+- Kolic: **SuicideAnalysisFinalNoJoke.ipynb**
+  - Preliminary Analysis: control group generation
+  - Suicide Analysis: Data cleaning for the analysis, histogram, independent t-test
+  - Data Story: Suicide Section
+
+- Mete: **gender.ipynb** & **country.ipynb**
+  - Gender Analysis: Data cleaning for the analysis, heatmap, histograms, independent t-test, validation with external resource
+  - Country Analysis: Data cleaning for the analysis, interactive world map
+  - Data Story: Gender & Country Section
+
+- Rohith: **entrepreneur_artist_compare.ipynb**
+  - Entrepreneur & Artist Analysis: Data cleaning for the analysis, heapmap, histograms, validation with external resource
+  - Data Story: Entrepreneur & Artist Section
+
+- Yiren: **final_politician.ipynb**
+  - Politician Analysis: Data cleaning for the analysis, heatmap Shiny app, validation with external resource & control group, PCA, K-means Clustering
+  - Gender Analysis: Decision Tree and Cross Validation
+  - Data Story: Politician Section
+
+Example
+John: Plotting graphs during data analysis, crawling the data, preliminary data analysis;
+Mary: Problem formulation, coming up with the algorithm;
+Chris: Coding up the algorithm, running tests, tabulating final results;
+Eve: Writing up the report or the data story, preparing the final presentation.
+
 ## Abstract
 Language is the main mode of communication through which a person expresses their thoughts and feelings. This then raises an interesting question: Can language use reflect personality types?  There have been several studies on this topic that have shown significant correlations between different word categories and personality types. In this project, we exploit these correlations to identify personality characteristics for different speakers in the Quotebank dataset. Similarities or differences of these personality styles of groups or individuals are then used to answer some interesting psycho-sociolinguistic questions about people across professions, countries, races and ethnicities among other categories.
 
