@@ -21,7 +21,7 @@ https://mismayil.github.io/words-personalities/
   - Entrepreneur & Artist Analysis: Data cleaning for the analysis, heapmap, histograms, validation with external resource
   - Data Story: Entrepreneur & Artist Section
 
-- Yiren: (politician_analysis.ipynb & app.R & R_for_politician.Rmd)
+- Yiren: (politician_analysis.ipynb, app.R & R_for_politician.Rmd)
   - Politician Analysis: Data cleaning for the analysis, heatmap Shiny app, validation with external resource & control group, PCA, K-means Clustering
   - Gender Analysis: Decision Tree and Cross Validation
   - Data Story: Politician Section
