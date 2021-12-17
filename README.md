@@ -5,23 +5,23 @@
 https://mismayil.github.io/words-personalities/
 
 ### Contribution Details of all group members: 
-**with final notebooks mentioned**
+(with final notebooks mentioned in the brackets)
 
-- Kolic: **SuicideAnalysisFinalNoJoke.ipynb**
+- Kolic: (SuicideAnalysisFinalNoJoke.ipynb)
   - Preliminary Analysis: control group generation
   - Suicide Analysis: Data cleaning for the analysis, histogram, independent t-test
   - Data Story: Suicide Section
 
-- Mete: **gender.ipynb** & **country.ipynb**
+- Mete: (gender.ipynb & country.ipynb)
   - Gender Analysis: Data cleaning for the analysis, heatmap, histograms, independent t-test, validation with external resource
   - Country Analysis: Data cleaning for the analysis, interactive world map
   - Data Story: Gender & Country Section
 
-- Rohith: **entrepreneur_artist_compare.ipynb**
+- Rohith: (entrepreneur_artist_compare.ipynb)
   - Entrepreneur & Artist Analysis: Data cleaning for the analysis, heapmap, histograms, validation with external resource
   - Data Story: Entrepreneur & Artist Section
 
-- Yiren: **final_politician.ipynb**
+- Yiren: (final_politician.ipynb)
   - Politician Analysis: Data cleaning for the analysis, heatmap Shiny app, validation with external resource & control group, PCA, K-means Clustering
   - Gender Analysis: Decision Tree and Cross Validation
   - Data Story: Politician Section
