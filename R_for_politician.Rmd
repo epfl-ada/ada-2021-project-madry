@@ -1,0 +1,149 @@
+---
+title: "R for politician"
+output: html_document
+---
+
+```{r, warning = FALSE, message = FALSE}
+# Load R packages
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(gghighlight)
+library(viridis)
+library(hrbrthemes)
+library(plotly)
+library(ggbiplot)
+library(ggpubr)
+library(purrr)
+library(cluster)
+library(factoextra)
+```
+
+## Personality Validation: control group vs Hillary, Trump
+```{r, warning = FALSE}
+# load control group data
+df = read.csv("control_big_five.csv")
+
+# Transform flat format to long format
+only_five_long <- df %>% 
+  select(c(neuroticism, extraversion, openness, agreeableness, conscientiousness)) %>% 
+  gather(personality, value, c(neuroticism, extraversion, openness, agreeableness, conscientiousness)) 
+
+# load politician data
+df1 = read.csv("concats")
+df2 <- df1 %>% 
+  select(c(neuroticism, extraversion, openness, agreeableness, conscientiousness,itemLabel))
+rownames(df2) <- df2$itemLabel
+df2 <- df2 %>% select(-itemLabel)
+
+# Extract personality for hillary and trump
+df_clinton <- df2[c("Hillary Clinton"),]
+df_trump <- df2[c("Donald Trump"),]
+df_clinton_long <- df_clinton %>% 
+  gather(personality, value)
+df_trump_long <- df_trump %>% 
+  gather(personality, value)
+
+p = ggplot(NULL, aes(x=personality, y=value, fill=personality)) +
+  geom_jitter(data = only_five_long, color="black", size=0.03, alpha=0.1) +
+    geom_boxplot(data = only_five_long) +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=11)
+    ) +
+    ggtitle("Donald Trump vs. Hillary Clinton") +
+    xlab("") + 
+  ylab("Personality Score") +
+  geom_jitter(data = df_clinton_long, color="blue", size=3, alpha=1) + # plot hillary point
+  geom_jitter(data = df_trump_long, color="red", size=3, alpha=1) # plot trump point
+
+p
+```
+
+The score of the 1000 people's control group is used to generate the boxplots above, the actual data points are also plotted in black. While the counterparts for Donald Trump and Hillary Clinton are plotted in red and blue respectively.
+
+According to the [paper `Perceived personality and campaign style of Hillary Clinton and Donald Trump`](https://www.sciencedirect.com/science/article/pii/S0191886917305688?casa_token=1aBX0HMkSQ0AAAAA:I4CHEpEfM9LRiQCrsLw1lk61IUt0MJu2RvD8L7t_PV_xBHisPnM8Z78xrEyfTpqa1Xo7ollgvM7L) where the big five personality score of Trump and Clinton are evaluated by domain experts as below. 
+Clinton scores low on neuroticism, average on agreeableness, extraversion, openness, and high on conscientiousness.
+Trump scores very low on agreeableness, conscientiousness and emotional stability, average on openness, and very high on extraversion.
+Our results agree to the research in agreeableness and conscientiousness but contradicts in extraversion, neuroticism and openness. 
+However, the personality rating is to some extent subjective. Even for the experts in this specific case, Trump supporters and Clinton supporters will rate significantly differently, as depicted in [a later finding](https://www.sciencedirect.com/science/article/pii/S0191886918300850).
+
+## PCA
+```{r, warning = FALSE}
+# reload politician data
+df = read.csv("concats")
+
+df1 <- df %>% 
+  select(c(87:121, 123, 134)) # 87:121 contains all personalities, 123 is name, 134 is party
+df_personality_party <-  df %>% 
+  select(c(87:121, 134))
+
+df2 <- df %>% select(c(123, 87:121))
+rownames(df2) <- df2$itemLabel
+df2 <- df2 %>% select(-itemLabel)
+
+# PCA
+pca_df = princomp(df2)
+
+p1 = ggscreeplot(pca_df) +
+  theme_bw(base_size = 20) + labs(y = "Prop. of explained variance")
+p2 = ggscreeplot(pca_df,type = "cev") + theme_bw(base_size = 20) + labs(y = " Cumulative prop. of explained variance")
+p1
+p2
+
+ggbiplot(pca_df, labels =  rownames(df2), labels.size = 3, varname.size = 5) +
+theme_bw(base_size = 20) + coord_cartesian(ylim = c(-2.5,2.5), xlim = c(-2.5,2.5))
+```
+
+As shown above, when we have PC1 and PC2, we can already explain most of the variance. Politicians are distributed all around. To have a better understanding, we implement k-means clustering for it.
+
+## K-means Clustering
+Since k-means clustering requires us to input a k value. We perform total wss and silhouette to look for the optimal k.
+
+```{r, warning = FALSE}
+fviz_nbclust(df2, kmeans, method = "wss")
+fviz_nbclust(df2, kmeans, method = "silhouette")
+```
+
+As shown, both plots shows that k = 2 might be the optimal choice. Hence we perform k-means clustering with k = 2.
+
+```{r, warning = FALSE}
+set.seed(1)
+cl_df = kmeans(df2, centers = 2, nstart = 25)
+newfactor = factor(cl_df$cluster)
+levels(newfactor) <- c("Cheerful Gregarious","Intellectual Liberals")
+
+p = ggbiplot(
+  pca_df,
+  groups = factor(newfactor),
+  labels =  rownames(df2),
+  labels.size= 1.5,
+  var.axes = FALSE,
+  ellipse = TRUE) + 
+  theme_bw(base_size = 20) +
+  theme(legend.position = "none") + 
+  theme_transparent() 
+
+ggplotly(p, height = 700, width=900) 
+```
+
+To gain more insights, we would like to cluster politician to more groups, and from the previous analysis we think k = 4 might also be an option that's not bad.
+
+```{r, warning = FALSE}
+cl_df = kmeans(df2, centers = 4, nstart = 25)
+p = ggbiplot(
+  pca_df,
+  groups = factor(cl_df$cluster),
+  labels =  rownames(df2),
+  labels.size= 1.5,
+  ellipse = TRUE, var.axes = FALSE) + 
+  theme_bw(base_size = 20) +
+  theme(legend.position = "none") + 
+  theme_transparent() 
+
+ggplotly(p, height = 700, width=900) 
+```
+
+
+
