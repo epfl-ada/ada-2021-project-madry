@@ -4,7 +4,8 @@
 
 https://mismayil.github.io/words-personalities/
 
-## Contribution Details of all group members: **with final notebooks mentioned**
+### Contribution Details of all group members: 
+**with final notebooks mentioned**
 
 - Kolic: **SuicideAnalysisFinalNoJoke.ipynb**
   - Preliminary Analysis: control group generation
