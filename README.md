@@ -7,7 +7,7 @@ https://mismayil.github.io/words-personalities/
 ### Contribution Details of all group members: 
 (with final notebooks mentioned in the brackets)
 
-- Kolic: (SuicideAnalysisFinalNoJoke.ipynb)
+- Kolic: (ControlGroup_Top1000.ipynb & SuicideAnalysis.ipynb)
   - Preliminary Analysis: control group generation
   - Suicide Analysis: Data cleaning for the analysis, histogram, independent t-test
   - Data Story: Suicide Section
