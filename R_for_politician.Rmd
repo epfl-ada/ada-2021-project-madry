@@ -23,7 +23,6 @@ library(factoextra)
 ```{r, warning = FALSE}
 # load control group data
 df = read.csv("control_big_five.csv")
-
 # Transform flat format to long format
 only_five_long <- df %>% 
   select(c(neuroticism, extraversion, openness, agreeableness, conscientiousness)) %>% 
