@@ -1,7 +1,7 @@
 import re
 import datetime
 import pandas as pd
-from typing import Callable
+from typing import Callable, Any, Generator, Tuple
 import bz2
 import json
 import os
@@ -16,6 +16,9 @@ import numpy as np
 import plotly.express as px
 from sklearn.cluster import DBSCAN
 from sklearn.manifold import TSNE
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+from sklearn.metrics import r2_score, accuracy_score
 
 wiki_client = Client()
 
@@ -606,3 +609,134 @@ def visualize_world(df, location_col, color_col, hover_cols, title=None, labels=
     )
     fig.update_geos(visible=False)
     return fig
+
+
+def plot_wordcloud(df, groupby_col='country', groupby_val=None, quotation_col='quotations'):
+    df_grouped = df.groupby(groupby_col).agg({quotation_col: lambda q: ' '.join(q)})
+    if groupby_val:
+        quotes = df_grouped.loc[groupby_val, quotation_col]
+    else:
+        quotes = ' '.join(df_grouped[quotation_col])
+    word_cloud = WordCloud(collocations = False, background_color = 'white').generate(quotes)
+    plt.imshow(word_cloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.show()
+    return word_cloud
+
+
+def to_numpy(x: Any) -> np.ndarray:
+    """Convert input to numpy array
+
+    Args:
+        x (Any): Input data
+
+    Returns:
+        np.ndarray: Numpy array
+    """
+    if isinstance(x, pd.DataFrame) or isinstance(x, pd.Series):
+        return x.to_numpy()
+    
+    if not isinstance(x, np.ndarray):
+        raise ValueError(f'Expected numpy array, got {type(x)}')
+
+    return x
+
+
+def mean_statistic(samples: np.ndarray) -> np.ndarray:
+    """Calculate mean statistic on the samples
+
+    Args:
+        samples (np.ndarray): Array of samples (i.e. each row is a sample)
+
+    Returns:
+        np.ndarray: Means of the samples
+    """
+    return np.array(samples).mean(axis=1)
+
+
+def generate_samples(data: Any, num_samples: int = 1000) -> np.ndarray:
+    """Generate random samples from the data with replacement
+
+    Args:
+        data (Any): Input data
+        num_samples (int, optional): Number of samples to generate. Defaults to 1000.
+
+    Returns:
+        np.ndarray: [description]
+    """
+    data = np.array(data)
+    samples = []
+
+    for n in range(num_samples):
+        indices = np.random.randint(0, len(data), len(data))
+        sample = data[indices]
+        samples.append(sample)
+    
+    return np.array(samples)
+
+
+def confidence_interval(samples: np.ndarray, confidence: int = 95, statistic_fn: Callable = mean_statistic) -> Tuple[float, float]:
+    """Calculate confidence interval given samples and a function to calculate statistics on the samples.
+
+    Args:
+        samples (np.ndarray): Array of samples
+        confidence (int, optional): Confidence level. Defaults to 95.
+        statistic_fn (Callable, optional): Statistics function to apply to samples. Defaults to mean_statistic.
+
+    Returns:
+        List[float, float]: Confidence interval
+    """
+    lower_percentile = (100 - confidence) // 2
+    upper_percentile = lower_percentile + confidence
+    statistics = statistic_fn(samples)
+    return np.nanpercentile(statistics, lower_percentile), np.nanpercentile(statistics, upper_percentile)
+
+
+def kfold_cv_iter(X: Any, y: Any, k: int = 5, seed: float = 1) -> Generator:
+    """Iterate over data in k CV folds
+
+    Args:
+        X (Any): Features data
+        y (Any): Labels data
+        k (int, optional): Number of folds. Defaults to 5.
+        seed (float, optional): Random seed. Defaults to 1.
+
+    Yields:
+        Generator: X_train, y_train, X_test, y_test
+    """
+    X, y = to_numpy(X), to_numpy(y)
+    num_row = y.shape[0]
+    fold_size = int(num_row / k)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    
+    for i in range(k):
+        test_indices = indices[i * fold_size: (i + 1) * fold_size]
+        train_indices = list(set(range(num_row)) - set(test_indices))
+        yield X[train_indices], y[train_indices], X[test_indices], y[test_indices]
+
+
+def cross_validate(estimator: Any, X: Any, y: Any, k_fold: int = 5, seed: float = 1) -> dict:
+    """Perform cross validation using the given estimator on the given data
+    and report R2 score and the confidence intervals
+
+    Args:
+        estimator (Any): Estimator model
+        X (Any): Features data
+        y (Any): Labels data
+        k_fold (int, optional): Number of folds. Defaults to 5.
+        seed (float, optional): Random seed. Defaults to 1.
+
+    Returns:
+        dict: Dictionary of metrics
+    """
+    accuracy_scores = []
+
+    for X_train, y_train, X_test, y_test in kfold_cv_iter(X, y, k=k_fold, seed=seed):
+        estimator.fit(X_train, y_train)
+        y_pred = estimator.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        accuracy_scores.append(accuracy)
+
+    return {'accuracy_score': np.mean(accuracy_scores),
+            'accuracy_conf_interval': confidence_interval(generate_samples(accuracy_scores, len(accuracy_scores)), confidence=95)}
